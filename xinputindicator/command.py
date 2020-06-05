@@ -58,7 +58,7 @@ class Device:
     def add_child(self, device):
         self.children.append(device)
 
-LINE_REGEX = re.compile(
+MAIN_LINE_REGEX = re.compile(
     r'''
         [~⎡⎜⎣]?(\s+↳)?                   \s+   # discarded
         (?P<name>.*)                     \s+
@@ -77,6 +77,8 @@ LINE_REGEX = re.compile(
     re.VERBOSE
 )
 
+SUBORDINATE_LINE_REGEX = re.compile('^\s+[^\s↳]')
+
 def parse(string):
     """
     As its name implies, `Parser` does parse `xinput` output.
@@ -88,14 +90,54 @@ def parse(string):
     ...     ↳ B1   id=5    [slave  keyboard (3)]
     ... ~ C        id=6    [floating slave]
     ... ''')
-    [Device(2, 'A', 3, 'master', 'pointer', [Device(4, 'A1', 2, 'slave', 'pointer')]), Device(3, 'B', 2, 'master', 'keyboard', [Device(5, 'B1', 3, 'slave', 'keyboard')]), Device(6, 'C', None, 'slave', 'floating')]
-    """
+    [Device(2, 'A', 3, 'master', 'pointer', True, [Device(4, 'A1', 2, 'slave', 'pointer', True)]), Device(3, 'B', 2, 'master', 'keyboard', True, [Device(5, 'B1', 3, 'slave', 'keyboard', True)]), Device(6, 'C', None, 'slave', 'floating', True)]
 
+    `parse()` does deal well with the long output:
+
+    >>> parse('''
+    ... ⎡ A        id=2    [master pointer  (3)]
+    ...     Reporting 1 classes:
+    ...         Class originated from: 7. Type: XIKeyClass
+    ...            Keycodes supported: 248
+    ... ⎜   ↳ A1   id=4    [slave  pointer  (2)]
+    ...         Reporting 1 classes:
+    ...             Class originated from: 7. Type: XIKeyClass
+    ...                 Keycodes supported: 248
+    ... ⎣ B        id=3    [master keyboard (2)]
+    ...     Reporting 1 classes:
+    ...         Class originated from: 7. Type: XIKeyClass
+    ...     ↳ B1   id=5    [slave  keyboard (3)]
+    ...         Reporting 1 classes:
+    ...             Class originated from: 7. Type: XIKeyClass
+    ...                 Keycodes supported: 248
+    ... ~ C        id=6    [floating slave]
+    ...     Reporting 1 classes:
+    ...         Class originated from: 7. Type: XIKeyClass
+    ...            Keycodes supported: 248
+    ... ''')
+    [Device(2, 'A', 3, 'master', 'pointer', True, [Device(4, 'A1', 2, 'slave', 'pointer', True)]), Device(3, 'B', 2, 'master', 'keyboard', True, [Device(5, 'B1', 3, 'slave', 'keyboard', True)]), Device(6, 'C', None, 'slave', 'floating', True)]
+
+    If a device is disabled, so should be the object returned by `parse()`:
+
+    >>> parse('''
+    ... ⎡ A        id=2    [master pointer  (3)]
+    ...     This device is disabled
+    ...     Reporting 1 classes:
+    ...         Class originated from: 7. Type: XIKeyClass
+    ...            Keycodes supported: 248
+    ... ⎣ B        id=3    [master keyboard (2)]
+    ...     Reporting 1 classes:
+    ...         Class originated from: 7. Type: XIKeyClass    ... ''')
+    [Device(2, 'A', 3, 'master', 'pointer', False), Device(3, 'B', 2, 'master', 'keyboard', True)]
+
+    """
     device_list = []
     device_map = {}
     lines = string.split('\n')
     for l in lines:
-        if not l:
+        if not l or SUBORDINATE_LINE_REGEX.match(l):
+            if 'This device is disabled' in l:
+                device.enabled = False
             continue
         device = parse_line(l)
         device_map[device.id] = device
@@ -111,15 +153,15 @@ def parse_line(line):
     object:
 
     >>> parse_line('⎡ A    id=2    [master pointer  (3)]')
-    Device(2, 'A', 3, 'master', 'pointer')
+    Device(2, 'A', 3, 'master', 'pointer', True)
 
     It naturally should also handle floating devices:
 
     >>> parse_line('~ B1   id=5    [floating slave]')
-    Device(5, 'B1', None, 'slave', 'floating')
+    Device(5, 'B1', None, 'slave', 'floating', True)
     """
 
-    m = LINE_REGEX.search(line)
+    m = MAIN_LINE_REGEX.search(line)
     if m is None:
         raise ValueError('Could not parse line {0}'.format(repr(line)))
     id = int(m.group('id'))
