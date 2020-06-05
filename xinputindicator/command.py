@@ -25,13 +25,13 @@ class Device:
 
     >>> d = Device(id=1, name='abc', level='master', parent_id=4, type='keyboard')
     >>> d
-    Device(1, 'abc', 4, 'master', 'keyboard')
+    Device(1, 'abc', 4, 'master', 'keyboard', True)
 
     You can also add a device as a child of another with ``add_child()``:
 
     >>> d.add_child(Device(2, 'def', 1, 'slave', 'keyboard'))
     >>> d
-    Device(1, 'abc', 4, 'master', 'keyboard', [Device(2, 'def', 1, 'slave', 'keyboard')])
+    Device(1, 'abc', 4, 'master', 'keyboard', True, [Device(2, 'def', 1, 'slave', 'keyboard', True)])
     """
 
     def __init__(self, id, name, parent_id, level, type):
@@ -40,11 +40,13 @@ class Device:
         self.parent_id = parent_id
         self.level = level
         self.type = type
+        self.enabled = True
         self.children = []
 
     def __repr__(self):
         parameters = [
-            self.id, self.name, self.parent_id, self.level, self.type
+            self.id, self.name, self.parent_id, self.level, self.type,
+            self.enabled
         ]
         if self.children:
             parameters.append(self.children)
