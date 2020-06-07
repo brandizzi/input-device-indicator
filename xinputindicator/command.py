@@ -170,3 +170,31 @@ def parse_line(line):
     level = m.group('level1') or m.group('level2')
     type = m.group('type1') or m.group('type2')
     return Device(id, name, parent_id, level, type)
+
+def get_device_from_list_by_id(devices, device_id):
+    """
+    Given a list/tree returned by `XInput.list()` and a device id, returns the
+    device with the given id:
+
+    >>> xi = XInput()
+    >>> devices = xi.list()
+    >>> devices[0] == get_device_from_list_by_id(devices, devices[0].id)
+    True
+
+    It should work even with children devices:
+
+    >>> devices[0].children[-1] == get_device_from_list_by_id(
+    ...     devices,
+    ...     devices[0].children[-1].id
+    ... )
+    True
+
+    (This function was made for tests but may work elsewhere.)
+    """
+    for parent_device in devices:
+        if parent_device.id == device_id:
+            return parent_device
+        for child_device in parent_device.children:
+            if child_device.id == device_id:
+                return child_device
+    return None
