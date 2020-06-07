@@ -18,6 +18,61 @@ class XInput:
         )
         return parse(cp.stdout.decode('utf-8'))
 
+    def disable(self, device):
+        """
+        Given a specific device...
+
+        >>> xi = XInput()
+        >>> devices = xi.list()
+        >>> device = devices[1].children[-1]
+        >>> # For restoring later.
+	>>> current_status = device.enabled
+
+        ...`disable()` disables it:
+
+        >>> xi.disable(device)
+        >>> device = get_device_from_list_by_id(xi.list(), device.id)
+        >>> device.enabled
+        False
+
+        To enable it again, you can use `enable()`:
+
+        >>> xi.enable(device)
+        >>> device = get_device_from_list_by_id(xi.list(), device.id)
+        >>> device.enabled
+        True
+
+        >>> # If it was disabled before, let it this way.
+        >>> if not current_status:
+        ...    xi.disable(device)
+        """
+        subprocess.run(['xinput', '--disable', str(device.id)])
+
+    def enable(self, device):
+        """
+        Given a specific device...
+
+        >>> xi = XInput()
+        >>> devices = xi.list()
+        >>> device = devices[1].children[-1]
+        >>> # For restoring later.
+	>>> current_status = device.enabled
+	>>> xi.disable(device)
+
+        ...`enable()` enables it:
+
+        >>> xi.enable(device)
+        >>> device = get_device_from_list_by_id(xi.list(), device.id)
+        >>> device.enabled
+        True
+
+        >>> # If it was disabled before, let it this way.
+        >>> if not current_status:
+        ...    xi.disable(device)
+        """
+        cp = subprocess.run(['xinput', '--enable', str(device.id)])
+
+
 class Device:
     """
     The `Device` class represents a device listed by `xinput`. Each device 
