@@ -2,6 +2,7 @@
 import re
 import subprocess
 
+
 class XInput:
 
     def list(self):
@@ -26,7 +27,7 @@ class XInput:
         >>> devices = xi.list()
         >>> device = devices[1].children[-1]
         >>> # For restoring later.
-	>>> current_status = device.enabled
+        >>> current_status = device.enabled
 
         ...`disable()` disables it:
 
@@ -56,8 +57,8 @@ class XInput:
         >>> devices = xi.list()
         >>> device = devices[1].children[-1]
         >>> # For restoring later.
-	>>> current_status = device.enabled
-	>>> xi.disable(device)
+        >>> current_status = device.enabled
+        >>> xi.disable(device)
 
         ...`enable()` enables it:
 
@@ -70,15 +71,17 @@ class XInput:
         >>> if not current_status:
         ...    xi.disable(device)
         """
-        cp = subprocess.run(['xinput', '--enable', str(device.id)])
+        subprocess.run(['xinput', '--enable', str(device.id)])
 
 
 class Device:
     """
-    The `Device` class represents a device listed by `xinput`. Each device 
+    The `Device` class represents a device listed by `xinput`. Each device
     should have an id, a name and the id of a parent device.
 
-    >>> d = Device(id=1, name='abc', level='master', parent_id=4, type='keyboard')
+    >>> d = Device(
+    ...     id=1, name='abc', level='master', parent_id=4, type='keyboard'
+    ... )
     >>> d
     Device(1, 'abc', 4, 'master', 'keyboard', True)
 
@@ -86,7 +89,8 @@ class Device:
 
     >>> d.add_child(Device(2, 'def', 1, 'slave', 'keyboard'))
     >>> d
-    Device(1, 'abc', 4, 'master', 'keyboard', True, [Device(2, 'def', 1, 'slave', 'keyboard', True)])
+    Device(1, 'abc', 4, 'master', 'keyboard', True, [Device(2, 'def', 1, \
+'slave', 'keyboard', True)])
     """
 
     def __init__(self, id, name, parent_id, level, type):
@@ -109,9 +113,9 @@ class Device:
             ', '.join(repr(p) for p in parameters)
         )
 
-
     def add_child(self, device):
         self.children.append(device)
+
 
 MAIN_LINE_REGEX = re.compile(
     r'''
@@ -132,7 +136,8 @@ MAIN_LINE_REGEX = re.compile(
     re.VERBOSE
 )
 
-SUBORDINATE_LINE_REGEX = re.compile('^\s+[^\s↳]')
+SUBORDINATE_LINE_REGEX = re.compile(r'^\s+[^\s↳]')
+
 
 def parse(string):
     """
@@ -145,7 +150,11 @@ def parse(string):
     ...     ↳ B1   id=5    [slave  keyboard (3)]
     ... ~ C        id=6    [floating slave]
     ... ''')
-    [Device(2, 'A', 3, 'master', 'pointer', True, [Device(4, 'A1', 2, 'slave', 'pointer', True)]), Device(3, 'B', 2, 'master', 'keyboard', True, [Device(5, 'B1', 3, 'slave', 'keyboard', True)]), Device(6, 'C', None, 'slave', 'floating', True)]
+    [Device(2, 'A', 3, 'master', 'pointer', True, \
+[Device(4, 'A1', 2, 'slave', 'pointer', True)]), \
+Device(3, 'B', 2, 'master', 'keyboard', True, \
+[Device(5, 'B1', 3, 'slave', 'keyboard', True)]), \
+Device(6, 'C', None, 'slave', 'floating', True)]
 
     `parse()` does deal well with the long output:
 
@@ -170,7 +179,11 @@ def parse(string):
     ...         Class originated from: 7. Type: XIKeyClass
     ...            Keycodes supported: 248
     ... ''')
-    [Device(2, 'A', 3, 'master', 'pointer', True, [Device(4, 'A1', 2, 'slave', 'pointer', True)]), Device(3, 'B', 2, 'master', 'keyboard', True, [Device(5, 'B1', 3, 'slave', 'keyboard', True)]), Device(6, 'C', None, 'slave', 'floating', True)]
+    [Device(2, 'A', 3, 'master', 'pointer', True, \
+[Device(4, 'A1', 2, 'slave', 'pointer', True)]), \
+Device(3, 'B', 2, 'master', 'keyboard', True, \
+[Device(5, 'B1', 3, 'slave', 'keyboard', True)]), \
+Device(6, 'C', None, 'slave', 'floating', True)]
 
     If a device is disabled, so should be the object returned by `parse()`:
 
@@ -183,18 +196,18 @@ def parse(string):
     ... ⎣ B        id=3    [master keyboard (2)]
     ...     Reporting 1 classes:
     ...         Class originated from: 7. Type: XIKeyClass    ... ''')
-    [Device(2, 'A', 3, 'master', 'pointer', False), Device(3, 'B', 2, 'master', 'keyboard', True)]
-
+    [Device(2, 'A', 3, 'master', 'pointer', False), \
+Device(3, 'B', 2, 'master', 'keyboard', True)]
     """
     device_list = []
     device_map = {}
     lines = string.split('\n')
-    for l in lines:
-        if not l or SUBORDINATE_LINE_REGEX.match(l):
-            if 'This device is disabled' in l:
+    for line in lines:
+        if not line or SUBORDINATE_LINE_REGEX.match(line):
+            if 'This device is disabled' in line:
                 device.enabled = False
             continue
-        device = parse_line(l)
+        device = parse_line(line)
         device_map[device.id] = device
         if device.level == 'slave' and device.type != 'floating':
             device_map[device.parent_id].add_child(device)
@@ -202,9 +215,10 @@ def parse(string):
             device_list.append(device)
     return device_list
 
+
 def parse_line(line):
     """
-    `parse_line()` parses one line from the `xinput` output into a `Device` 
+    `parse_line()` parses one line from the `xinput` output into a `Device`
     object:
 
     >>> parse_line('⎡ A    id=2    [master pointer  (3)]')
@@ -215,7 +229,6 @@ def parse_line(line):
     >>> parse_line('~ B1   id=5    [floating slave]')
     Device(5, 'B1', None, 'slave', 'floating', True)
     """
-
     m = MAIN_LINE_REGEX.search(line)
     if m is None:
         raise ValueError('Could not parse line {0}'.format(repr(line)))
@@ -225,6 +238,7 @@ def parse_line(line):
     level = m.group('level1') or m.group('level2')
     type = m.group('type1') or m.group('type2')
     return Device(id, name, parent_id, level, type)
+
 
 def get_device_from_list_by_id(devices, device_id):
     """

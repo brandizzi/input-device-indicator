@@ -1,6 +1,6 @@
 import gi
-gi.require_version('Gtk', '3.0')
-gi.require_version('AppIndicator3', '0.1')
+gi.require_version('Gtk', '3.0')  # noqa
+gi.require_version('AppIndicator3', '0.1')  # noqa
 
 from gi.repository import Gtk as gtk
 from gi.repository import AppIndicator3 as appindicator
@@ -8,6 +8,7 @@ from gi.repository import AppIndicator3 as appindicator
 import os.path
 
 from xinputindicator.command import XInput
+
 
 class Application:
 
@@ -20,6 +21,7 @@ class Application:
         self.indicator.set_status(appindicator.IndicatorStatus.ACTIVE)
         gtk.main()
 
+
 def build_indicator(menu):
     indicator = appindicator.Indicator.new(
         'xinput-indicator', os.path.abspath('resources/icon.png'),
@@ -28,8 +30,9 @@ def build_indicator(menu):
     indicator.set_menu(menu)
     return indicator
 
+
 def build_menu(devices):
-    """ Build a menu from a list of devices. Let's suppose we have the 
+    """ Build a menu from a list of devices. Let's suppose we have the
     following devices, for example:
 
     >>> from xinputindicator.command import parse
@@ -40,7 +43,10 @@ def build_menu(devices):
     ...     ↳ B1   id=5    [slave  keyboard (3)]
     ... ''')
     >>> devices
-    [Device(2, 'A', 3, 'master', 'pointer', [Device(4, 'A1', 2, 'slave', 'pointer')]), Device(3, 'B', 2, 'master', 'keyboard', [Device(5, 'B1', 3, 'slave', 'keyboard')])]
+    [Device(2, 'A', 3, 'master', 'pointer', \
+[Device(4, 'A1', 2, 'slave', 'pointer')]), \
+Device(3, 'B', 2, 'master', 'keyboard', \
+[Device(5, 'B1', 3, 'slave', 'keyboard')])]
 
     >>> menu = build_menu(devices)
 
@@ -64,6 +70,7 @@ def build_menu(devices):
             menu.append(gtk.MenuItem(c.name))
     menu.show_all()
     return menu
+
 
 if __name__ == "__main__":
     application = Application()
