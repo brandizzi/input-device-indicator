@@ -43,10 +43,10 @@ def build_menu(devices):
     ...     ↳ B1   id=5    [slave  keyboard (3)]
     ... ''')
     >>> devices
-    [Device(2, 'A', 3, 'master', 'pointer', \
-[Device(4, 'A1', 2, 'slave', 'pointer')]), \
-Device(3, 'B', 2, 'master', 'keyboard', \
-[Device(5, 'B1', 3, 'slave', 'keyboard')])]
+    [Device(2, 'A', 3, 'master', 'pointer', True, \
+[Device(4, 'A1', 2, 'slave', 'pointer', True)]), \
+Device(3, 'B', 2, 'master', 'keyboard', True, \
+[Device(5, 'B1', 3, 'slave', 'keyboard', True)])]
 
     >>> menu = build_menu(devices)
 
