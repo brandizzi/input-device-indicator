@@ -94,12 +94,17 @@ def build_menu_item(device):
     >>> from command import Device
     >>> d = Device(1, 'abc', 4, 'master', 'keyboard')
     >>> mi = build_menu_item(d)
+    >>> mi.get_label()
+    'abc'
+
+    Also, the original device instance should be attached to the menu item:
+
+    >>> mi.device == d
+    True
 
     If it is a parent device, it should be a "plain" `gtk.MenuItem` (i. e., not
     a `gtk.CheckMenuItem`):
 
-    >>> mi.get_label()
-    'abc'
     >>> isinstance(mi, gtk.MenuItem)
     True
     >>> isinstance(mi, gtk.CheckMenuItem)
@@ -133,6 +138,7 @@ def build_menu_item(device):
     else:
         menu_item = gtk.CheckMenuItem(device.name)
         menu_item.set_active(device.enabled)
+    menu_item.device = device
     return menu_item
 
 
