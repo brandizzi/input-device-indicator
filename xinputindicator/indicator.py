@@ -15,6 +15,7 @@ class Application:
     def __init__(self):
         self.xinput = XInput()
         self.menu = build_menu(self.xinput.list())
+        connect_device_check_menu_item_toggle_callback(self.menu, self.xinput)
         self.indicator = build_indicator(self.menu)
 
     def main(self):
@@ -140,6 +141,41 @@ def build_menu_item(device):
         menu_item.set_active(device.enabled)
     menu_item.device = device
     return menu_item
+
+
+def device_check_menu_item_toggle_callback(check_menu_item, xinput):
+    """
+    Callback to enable or disable a device when its `gtk.CheckMenuItem` is
+    clicked.
+
+    It should receive a `XInput`-like object as argument:
+
+    >>> from xinputindicator import mock
+    >>> xinput = mock.MockXInput()
+
+    When called with a menu item, it should try to toggle its state:
+
+    >>> from command import Device
+    >>> mi = build_menu_item(Device(1, 'abc', 4, 'slave', 'keyboard'))
+    >>> mi.set_active(False)
+    >>> device_check_menu_item_toggle_callback(mi, xinput)
+    Device abc disabled
+    >>> mi.set_active(True)
+    >>> device_check_menu_item_toggle_callback(mi, xinput)
+    Device abc enabled
+    """
+    if check_menu_item.get_active():
+        xinput.enable(check_menu_item.device)
+    else:
+        xinput.disable(check_menu_item.device)
+
+
+def connect_device_check_menu_item_toggle_callback(menu, xinput):
+    for mi in menu.get_children():
+        if isinstance(mi, gtk.CheckMenuItem) and hasattr(mi, 'device'):
+            mi.connect(
+                'toggled', device_check_menu_item_toggle_callback, xinput
+            )
 
 
 if __name__ == "__main__":
