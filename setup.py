@@ -2,15 +2,15 @@
 from setuptools import setup, find_packages
 
 setup(
-    name="xinput-indicator",
+    name="input-device-indicator",
     version="0.0.1.dev1",
     author='Adam Victor Brandizzi',
     author_email='adam@brandizzi.com.br',
-    description='xinput-indicator',
+    description='input-device-indicator',
     license='LGPLv3',
-    url='https://github.com/brandizzi/xinput-indicator',
+    url='https://github.com/brandizzi/input-device-indicator',
 
     packages=find_packages(),
-    test_suite='xinputindicator.tests',
+    test_suite='inputdeviceindicator.tests',
     test_loader='unittest:TestLoader',
 )

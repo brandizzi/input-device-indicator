@@ -7,7 +7,7 @@ from gi.repository import AppIndicator3 as appindicator
 
 import os.path
 
-from xinputindicator.command import XInput
+from inputdeviceindicator.command import XInput
 
 
 class Application:
@@ -25,7 +25,7 @@ class Application:
 
 def build_indicator(menu):
     indicator = appindicator.Indicator.new(
-        'xinput-indicator', os.path.abspath('resources/icon.png'),
+        'input-device-indicator', 'keyboard',
         appindicator.IndicatorCategory.SYSTEM_SERVICES
     )
     indicator.set_menu(menu)
@@ -36,7 +36,7 @@ def build_menu(devices):
     """ Build a menu from a list of devices. Let's suppose we have the
     following devices, for example:
 
-    >>> from xinputindicator.command import parse
+    >>> from inputdeviceindicator.command import parse
     >>> devices = parse('''
     ... ⎡ A        id=2    [master pointer  (3)]
     ... ⎜   ↳ A1   id=4    [slave  pointer  (2)]
@@ -150,7 +150,7 @@ def device_check_menu_item_toggle_callback(check_menu_item, xinput):
 
     It should receive a `XInput`-like object as argument:
 
-    >>> from xinputindicator import mock
+    >>> from inputdeviceindicator import mock
     >>> xinput = mock.MockXInput()
 
     When called with a menu item, it should try to toggle its state:
