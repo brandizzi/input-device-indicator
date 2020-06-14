@@ -1,5 +1,8 @@
 #!/usr/bin/env python
 
+def noop(*args, **kwargs):
+    pass
+
 class MockXInput:
 
     def enable(self, device):

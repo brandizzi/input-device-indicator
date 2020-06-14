@@ -78,23 +78,27 @@ Device(3, 'B', 2, 'master', 'keyboard', True, \
 
     menu = gtk.Menu()
     for d in devices:
-        menu.append(build_menu_item(d))
+        menu.append(gtk.MenuItem(d.name))
         for c in d.children:
-            menu.append(build_menu_item(c))
+            menu.append(build_device_check_menu_item(c, lambda _: None))
     menu.show_all()
     return menu
 
 
-def build_menu_item(device):
+def build_device_check_menu_item(device, callback):
     """
-    Returns a `gtk.MenuItem` representing the device.
+    Returns a `gtk.CheckMenuItem` representing the given child device, with the
+    given callback connected to its `toggled` event..
 
+    >>> from command import Device
+    >>> from inputdeviceindicator.mock import noop
+    >>> d = Device(1, 'abc', 4, 'slave', 'keyboard')
+    >>> mi = build_device_check_menu_item(d, noop)
+    >>> isinstance(mi, gtk.CheckMenuItem)
+    True
 
     It should have the device's name as its title:
 
-    >>> from command import Device
-    >>> d = Device(1, 'abc', 4, 'master', 'keyboard')
-    >>> mi = build_menu_item(d)
     >>> mi.get_label()
     'abc'
 
@@ -103,26 +107,7 @@ def build_menu_item(device):
     >>> mi.device == d
     True
 
-    If it is a parent device, it should be a "plain" `gtk.MenuItem` (i. e., not
-    a `gtk.CheckMenuItem`):
-
-    >>> isinstance(mi, gtk.MenuItem)
-    True
-    >>> isinstance(mi, gtk.CheckMenuItem)
-    False
-
-    If it is a child device, it should be a `gtk.CheckMenuItem`:
-
-    >>> d = Device(1, 'abc', 4, 'slave', 'keyboard')
-    >>> mi = build_menu_item(d)
-    >>> isinstance(mi, gtk.CheckMenuItem)
-    True
-
-    The reason for the difference is that we want the parent devices to be
-    inert. As far as we know, the parent device cannot be disabled so there is
-    no reason to have state in it.
-
-    If the child device is enabled, the item is active:
+    If the device is enabled, the item is active:
 
     >>> mi.get_active()
     True
@@ -130,15 +115,23 @@ def build_menu_item(device):
     Otherwise, the item is inactive (unchecked):
 
     >>> d.enabled = False
-    >>> mi = build_menu_item(d)
+    >>> mi = build_device_check_menu_item(d, noop)
     >>> mi.get_active()
     False
+
+    If the function receives a parent device, it should fail:
+
+    >>> build_device_check_menu_item(
+    ...     Device(1, 'abc', 4, 'master', 'keyboard'), noop
+    ... )
+    Traceback (most recent call last):
+      ...
+    AssertionError: build_device_check_menu_item() only accepts child devices.
     """
-    if device.level == 'master':
-        menu_item = gtk.MenuItem(device.name)
-    else:
-        menu_item = gtk.CheckMenuItem(device.name)
-        menu_item.set_active(device.enabled)
+    assert device.level == \
+        'slave', 'build_device_check_menu_item() only accepts child devices.'
+    menu_item = gtk.CheckMenuItem(device.name)
+    menu_item.set_active(device.enabled)
     menu_item.device = device
     return menu_item
 
@@ -156,7 +149,9 @@ def device_check_menu_item_toggle_callback(check_menu_item, xinput):
     When called with a menu item, it should try to toggle its state:
 
     >>> from command import Device
-    >>> mi = build_menu_item(Device(1, 'abc', 4, 'slave', 'keyboard'))
+    >>> mi = build_device_check_menu_item(
+    ...    Device(1, 'abc', 4, 'slave', 'keyboard'), lambda _: None
+    ... )
     >>> mi.set_active(False)
     >>> device_check_menu_item_toggle_callback(mi, xinput)
     Device abc disabled
