@@ -46,13 +46,8 @@ def build_menu(devices, callbacks):
     ...     ↳ B1   id=5    [slave  keyboard (3)]
     ...         This device is disabled
     ... ''')
-    >>> devices
-    [Device(2, 'A', 3, 'master', 'pointer', True, \
-[Device(4, 'A1', 2, 'slave', 'pointer', True)]), \
-Device(3, 'B', 2, 'master', 'keyboard', True, \
-[Device(5, 'B1', 3, 'slave', 'keyboard', False)])]
 
-    ... then the menu should have an option for every one:
+    ...then the menu should have an option for every one:
 
     >>> from inputdeviceindicator.mock import MockMenuCallbacks
     >>> menu = build_menu(devices, MockMenuCallbacks())
@@ -213,9 +208,9 @@ class MenuCallbacks:
     def quit_menu_item_activate(self, menu_item):
         """
         Callback for quitting the application.
+
         >>> from inputdeviceindicator.mock import MockXInput
         >>> callbacks = MenuCallbacks(MockXInput())
-
 
         It should do it by calling `gtk.main_quit()`:
 
