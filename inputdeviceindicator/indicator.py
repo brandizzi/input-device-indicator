@@ -119,6 +119,19 @@ def build_device_check_menu_item(device, callback):
     >>> mi.get_active()
     False
 
+    The menu item should executed the given callback when the `toggled` event
+    is called:
+
+    >>> def callback(mi):
+    ...    print("menu item toggled to " + str(mi.get_active()))
+    >>> mi = build_device_check_menu_item(d, callback)
+    >>> mi.set_active(True)
+    menu item toggled to True
+    >>> mi.set_active(False)
+    menu item toggled to False
+    >>> mi.emit('toggled')
+    menu item toggled to False
+
     If the function receives a parent device, it should fail:
 
     >>> build_device_check_menu_item(
@@ -127,12 +140,14 @@ def build_device_check_menu_item(device, callback):
     Traceback (most recent call last):
       ...
     AssertionError: build_device_check_menu_item() only accepts child devices.
+
     """
     assert device.level == \
-        'slave', 'build_device_check_menu_item() only accepts child devices.'
+        'slave', "build_device_check_menu_item() only accepts child devices."
     menu_item = gtk.CheckMenuItem(device.name)
     menu_item.set_active(device.enabled)
     menu_item.device = device
+    menu_item.connect('toggled', callback)
     return menu_item
 
 
