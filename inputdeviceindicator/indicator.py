@@ -83,8 +83,18 @@ Device(3, 'B', 2, 'master', 'keyboard', True, \
 
     >>> items[3].set_active(True)
     Device B1 toggled to True
-    """
 
+    The last item from the menu is an option to quit the application:
+
+    >>> items[-1].get_label()
+    'Quit'
+
+    It will be connected to the `quit_menu_item_activate` method from
+    `callbacks`:
+
+    >>> items[-1].emit('activate')
+    Quit menu item activated
+    """
     menu = gtk.Menu()
     for d in devices:
         menu.append(gtk.MenuItem(d.name))
@@ -93,6 +103,10 @@ Device(3, 'B', 2, 'master', 'keyboard', True, \
                 c, callbacks.child_device_check_menu_item_toggled
             )
             menu.append(cdcmi)
+    menu.append(gtk.SeparatorMenuItem())
+    quit_menu_item = gtk.MenuItem('Quit')
+    quit_menu_item.connect('activate', callbacks.quit_menu_item_activate)
+    menu.append(quit_menu_item)
     menu.show_all()
     return menu
 
@@ -195,6 +209,23 @@ class MenuCallbacks:
             self.xinput.enable(check_menu_item.device)
         else:
             self.xinput.disable(check_menu_item.device)
+
+    def quit_menu_item_activate(self, menu_item):
+        """
+        Callback for quitting the application.
+        >>> from inputdeviceindicator.mock import MockXInput
+        >>> callbacks = MenuCallbacks(MockXInput())
+
+
+        It should do it by calling `gtk.main_quit()`:
+
+        >>> real_main_quit = gtk.main_quit
+        >>> gtk.main_quit = lambda: print("gtk.main_quit() called")
+        >>> MenuCallbacks(MockXInput()).quit_menu_item_activate(None)
+        gtk.main_quit() called
+        >>> gtk.main_quit = real_main_quit
+        """
+        gtk.main_quit()
 
 
 if __name__ == "__main__":

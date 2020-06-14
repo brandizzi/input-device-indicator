@@ -21,3 +21,6 @@ class MockMenuCallbacks:
                 check_menu_item.device.name, check_menu_item.get_active()
             )
         )
+
+    def quit_menu_item_activate(self, menu_item):
+        print('Quit menu item activated')
