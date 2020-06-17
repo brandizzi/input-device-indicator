@@ -10,16 +10,11 @@ import os.path
 from inputdeviceindicator.command import XInput
 
 
-class Application:
-
-    def __init__(self):
-        self.xinput = XInput()
-        self.menu = build_menu(self.xinput.list(), MenuCallbacks(self.xinput))
-        self.indicator = build_indicator(self.menu)
-
-    def main(self):
-        self.indicator.set_status(appindicator.IndicatorStatus.ACTIVE)
-        gtk.main()
+def get_indicator():
+    xinput = XInput()
+    menu_callbacks = MenuCallbacks(xinput)
+    menu = build_menu(xinput.list(), menu_callbacks)
+    return build_indicator(menu)
 
 
 def build_indicator(menu):
@@ -221,8 +216,3 @@ class MenuCallbacks:
         >>> gtk.main_quit = real_main_quit
         """
         gtk.main_quit()
-
-
-if __name__ == "__main__":
-    application = Application()
-    application.main()
