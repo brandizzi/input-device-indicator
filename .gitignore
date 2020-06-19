@@ -3,7 +3,10 @@ __pycache__
 *.orig
 *.py[co]
 build/
+deb_dist/
 dist/
+tmp/
+input-device-indicator*.tar.gz
 *.egg-info
 *.eggs
 *.bkp
