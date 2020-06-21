@@ -1,0 +1,9 @@
+[Desktop Entry]
+Version=0.0.1
+Type=Application
+Name=Input Device Indicator
+Comment=Enable and disables such as keyboards, mouses and trackpads.
+Exec=input-device-indicator
+Icon=/usr/share/icons/input-device-indicator.svg
+Terminal=false
+Categories=Utility;GTK;GNOME;

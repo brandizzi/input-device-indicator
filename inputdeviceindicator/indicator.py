@@ -19,11 +19,24 @@ def get_indicator():
 
 def build_indicator(menu):
     indicator = appindicator.Indicator.new(
-        'input-device-indicator', 'keyboard',
+        'input-device-indicator', get_icon_path(),
         appindicator.IndicatorCategory.SYSTEM_SERVICES
     )
     indicator.set_menu(menu)
     return indicator
+
+
+def get_icon_path():
+    """
+    Returns the path to the application icon. Naturally, the application icon
+    file should exist:
+
+    >>> os.path.exists(get_icon_path())
+    True
+    """
+    return os.path.join(
+        os.path.dirname(__file__), 'resources/input-device-indicator.svg'
+    )
 
 
 def build_menu(devices, callbacks):
