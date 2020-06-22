@@ -1,4 +1,74 @@
-                    GNU GENERAL PUBLIC LICENSE
+70
+
+​
+
+71
+
+                       TERMS AND CONDITIONS
+
+72
+
+​
+
+73
+
+  0. Definitions.
+
+74
+
+​
+
+75
+
+  "This License" refers to version 3 of the GNU General Public License.
+
+76
+
+​
+
+77
+
+  "Copyright" also means copyright-like laws that apply to other kinds of
+
+78
+
+works, such as semiconductor masks.
+
+79
+
+​
+
+80
+
+  "The Program" refers to any copyrightable work licensed under this
+
+81
+
+License.  Each licensee is addressed as "you".  "Licensees" and
+
+82
+
+"recipients" may be individuals or organizations.
+
+83
+
+​
+
+84
+
+  To "modify" a work means to copy from or adapt all or part of the work
+
+85
+
+in a fashion requiring copyright permission, other than the making of an
+
+86
+
+exact copy.  The resulting work is called a "modified version" of the
+
+87
+
+earlier work or a work "based on" the earlier work.                    GNU GENERAL PUBLIC LICENSE
                        Version 3, 29 June 2007
 
  Copyright (C) 2007 Free Software Foundation, Inc. <https://fsf.org/>
