@@ -22,7 +22,7 @@ import setuptools
 
 setup(
     name="input-device-indicator",
-    version="0.0.1.dev1",
+    version="0.0.1",
     author='Adam Brandizzi',
     author_email='adam@brandizzi.com.br',
     description='Enable and disables such as keyboards, mouses and trackpads.',
