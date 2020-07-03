@@ -1,1 +1,2 @@
 inelegant>=0.3.0
+pycodestyle>=2.6.0
