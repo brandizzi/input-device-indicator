@@ -117,14 +117,14 @@ def build_menu(devices, callbacks):
     """
     menu = gtk.Menu()
     for d in devices:
-        menu.append(gtk.MenuItem(d.name))
+        menu.append(gtk.MenuItem(label=d.name))
         for c in d.children:
             cdcmi = build_device_check_menu_item(
                 c, callbacks.child_device_check_menu_item_toggled
             )
             menu.append(cdcmi)
     menu.append(gtk.SeparatorMenuItem())
-    quit_menu_item = gtk.MenuItem('Quit')
+    quit_menu_item = gtk.MenuItem(label='Quit')
     quit_menu_item.connect('activate', callbacks.quit_menu_item_activate)
     menu.append(quit_menu_item)
     menu.show_all()
@@ -190,7 +190,7 @@ def build_device_check_menu_item(device, callback):
     """
     assert device.level == \
         'slave', "build_device_check_menu_item() only accepts child devices."
-    menu_item = gtk.CheckMenuItem(device.name)
+    menu_item = gtk.CheckMenuItem(label=device.name)
     menu_item.set_active(device.enabled)
     menu_item.device = device
     menu_item.connect('toggled', callback)
