@@ -239,10 +239,9 @@ class MenuCallbacks:
 
         It should do it by calling `gtk.main_quit()`:
 
-        >>> real_main_quit = gtk.main_quit
-        >>> gtk.main_quit = lambda: print("gtk.main_quit() called")
-        >>> MenuCallbacks(MockXInput()).quit_menu_item_activate(None)
-        gtk.main_quit() called
-        >>> gtk.main_quit = real_main_quit
+        >>> from inelegant.module import temp_var
+        >>> with temp_var(gtk, 'main_quit', lambda: print('quit called')):
+        ...     MenuCallbacks(MockXInput()).quit_menu_item_activate(None)
+        quit called
         """
         gtk.main_quit()
