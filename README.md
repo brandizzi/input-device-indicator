@@ -2,7 +2,7 @@
 
 ![The icon of the application: an orange cat over a keyboard](inputdeviceindicator/resources/input-device-indicator.svg)
 
-This app is an indicator to enable you to disable and enable input devices.
+This app is an indicator to help you disable/enable input devices (such as keyboards, mouses and trackpads).
 
 ## How to Use
 
