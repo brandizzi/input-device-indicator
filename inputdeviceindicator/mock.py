@@ -43,5 +43,8 @@ class MockMenuCallbacks:
             )
         )
 
+    def refresh_menu_item_activate(self, menu_item, menu):
+        print('Refresh menu item activated')
+
     def quit_menu_item_activate(self, menu_item):
         print('Quit menu item activated')

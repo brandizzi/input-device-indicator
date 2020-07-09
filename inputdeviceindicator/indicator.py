@@ -205,8 +205,9 @@ def build_device_check_menu_item(device, callback):
 
 class MenuCallbacks:
 
-    def __init__(self, xinput):
+    def __init__(self, xinput, menu):
         self.xinput = xinput
+        self.menu = menu
 
     def child_device_check_menu_item_toggled(self, check_menu_item):
         """
@@ -216,7 +217,7 @@ class MenuCallbacks:
         It should receive a `XInput`-like object as argument:
 
         >>> from inputdeviceindicator import mock
-        >>> mcs = MenuCallbacks(mock.MockXInput())
+        >>> mcs = MenuCallbacks(mock.MockXInput(), gtk.Menu())
 
         When called with a menu item, it should try to toggle its state:
 
@@ -241,7 +242,7 @@ class MenuCallbacks:
         Callback for quitting the application.
 
         >>> from inputdeviceindicator.mock import MockXInput
-        >>> callbacks = MenuCallbacks(MockXInput())
+        >>> callbacks = MenuCallbacks(MockXInput(), gtk.Menu())
 
         It should do it by calling `gtk.main_quit()`:
 
@@ -251,3 +252,74 @@ class MenuCallbacks:
         quit called
         """
         gtk.main_quit()
+
+    def refresh_menu_item_activate(self, menu_item):
+        """
+        Refresh the menu by calling `xinput` again and regenerating all device
+        items in the menu.
+
+        Consider the following menu...
+
+        >>> from inputdeviceindicator.command import parse
+        >>> old_devices = parse('''
+        ... ⎡ A        id=2    [master pointer  (3)]
+        ... ⎜   ↳ A1   id=4    [slave  pointer  (2)]
+        ... ⎣ B        id=3    [master keyboard (2)]
+        ...     ↳ B1   id=5    [slave  keyboard (3)]
+        ...         This device is disabled
+        ... ''')
+        >>> from inputdeviceindicator.mock import MockMenuCallbacks
+        >>> callbacks = MockMenuCallbacks()
+        >>> menu = gtk.Menu()
+        >>> build_menu(menu, old_devices, callbacks)
+
+        ...and the following `XInput`:
+
+        >>> from inputdeviceindicator import mock
+        >>> new_devices = parse('''
+        ... ⎡ X        id=10    [master pointer  (9)]
+        ... ⎜   ↳ X1   id=11    [slave  pointer  (10)]
+        ... ⎣ Y        id=12    [master keyboard (8)]
+        ...     ↳ Y1   id=13    [slave  keyboard (12)]
+        ...         This device is disabled
+        ... ''')
+        >>> xinput = mock.MockXInput(new_devices)
+
+        The menu will of course have the old options listed:
+
+        >>> items = menu.get_children()
+        >>> items[0].get_label()
+        'A'
+        >>> items[1].get_label()
+        'A1'
+        >>> items[2].get_label()
+        'B'
+        >>> items[3].get_label()
+        'B1'
+
+        Also, the second last item should be a "Refresh" option:
+
+        >>> menu_item = items[-2]
+        >>> menu_item.get_label()
+        'Refresh'
+
+        Now, if we call `MenuCallbacks.refresh_menu_item_activate()` giving the
+        menu item (and the xinput to `MenuCallback` constructor...
+
+        >>> MenuCallbacks(xinput, menu).refresh_menu_item_activate(menu_item)
+
+        ...the device menu items should be updated:
+
+        >>> items = menu.get_children()
+        >>> items[0].get_label()
+        'X'
+        >>> items[1].get_label()
+        'X1'
+        >>> items[2].get_label()
+        'Y'
+        >>> items[3].get_label()
+        'Y1'
+        >>> items[3].get_active()
+        False
+        """
+        build_menu(self.menu, self.xinput.list(), self)
