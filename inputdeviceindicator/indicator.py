@@ -29,8 +29,9 @@ from inputdeviceindicator.command import XInput
 
 def get_indicator():
     xinput = XInput()
-    menu_callbacks = MenuCallbacks(xinput)
-    menu = build_menu(xinput.list(), menu_callbacks)
+    menu = gtk.Menu()
+    menu_callbacks = MenuCallbacks(xinput, menu)
+    build_menu(menu, xinput.list(), menu_callbacks)
     return build_indicator(menu)
 
 
@@ -56,10 +57,14 @@ def get_icon_path():
     )
 
 
-def build_menu(devices, callbacks):
+def build_menu(menu, devices, callbacks):
     """
     Build a menu from a list of devices, connecting them to corresponding
     callbacks from `callbacks`.
+
+    The menu should be created beforehand to be given to the function:
+
+    >>> menu = gtk.Menu()
 
     Let's suppose we have the following devices, for example:
 
@@ -75,7 +80,7 @@ def build_menu(devices, callbacks):
     ...then the menu should have an option for every one:
 
     >>> from inputdeviceindicator.mock import MockMenuCallbacks
-    >>> menu = build_menu(devices, MockMenuCallbacks())
+    >>> build_menu(menu, devices, MockMenuCallbacks())
     >>> items = menu.get_children()
     >>> items[0].get_label()
     'A'
@@ -115,7 +120,9 @@ def build_menu(devices, callbacks):
     >>> items[-1].emit('activate')
     Quit menu item activated
     """
-    menu = gtk.Menu()
+    for c in menu.get_children():
+        menu.remove(c)
+
     for d in devices:
         menu.append(gtk.MenuItem(label=d.name))
         for c in d.children:
@@ -128,7 +135,6 @@ def build_menu(devices, callbacks):
     quit_menu_item.connect('activate', callbacks.quit_menu_item_activate)
     menu.append(quit_menu_item)
     menu.show_all()
-    return menu
 
 
 def build_device_check_menu_item(device, callback):
