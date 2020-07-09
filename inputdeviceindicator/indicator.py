@@ -109,7 +109,13 @@ def build_menu(menu, devices, callbacks):
     >>> items[3].set_active(True)
     Device B1 toggled to True
 
-    The last item from the menu is an option to quit the application:
+    The second last item from the menu is an option to refresh the device
+    items...
+
+    >>> items[-2].get_label()
+    'Refresh'
+
+    ...and the last item from the menu is an option to quit the application:
 
     >>> items[-1].get_label()
     'Quit'
@@ -130,10 +136,19 @@ def build_menu(menu, devices, callbacks):
                 c, callbacks.child_device_check_menu_item_toggled
             )
             menu.append(cdcmi)
+
     menu.append(gtk.SeparatorMenuItem())
+
+    refresh_menu_item = gtk.MenuItem(label='Refresh')
+    refresh_menu_item.connect(
+        'activate', callbacks.refresh_menu_item_activate
+    )
+    menu.append(refresh_menu_item)
+
     quit_menu_item = gtk.MenuItem(label='Quit')
     quit_menu_item.connect('activate', callbacks.quit_menu_item_activate)
     menu.append(quit_menu_item)
+
     menu.show_all()
 
 
