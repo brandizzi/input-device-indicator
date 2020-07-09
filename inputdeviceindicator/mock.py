@@ -21,6 +21,12 @@ def noop(*args, **kwargs):
 
 class MockXInput:
 
+    def __init__(self, devices=None):
+        self.devices = devices if devices is not None else []
+
+    def list(self):
+        return self.devices
+
     def enable(self, device):
         print('Device {0} enabled'.format(device.name))
 
