@@ -22,5 +22,6 @@ from inelegant.finder import TestFinder
 
 load_tests = TestFinder(
     'inputdeviceindicator.command',
-    'inputdeviceindicator.indicator'
+    'inputdeviceindicator.indicator',
+    'inputdeviceindicator.menu'
 ).load_tests
