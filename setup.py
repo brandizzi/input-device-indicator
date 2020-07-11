@@ -20,14 +20,16 @@
 from distutils.core import setup
 import setuptools
 
+from inputdeviceindicator.info import VERSION, DESCRIPTION, URL, AUTHOR, EMAIL
+
 setup(
     name="input-device-indicator",
-    version="0.0.1",
-    author='Adam Brandizzi',
-    author_email='adam@brandizzi.com.br',
-    description='Enable and disables such as keyboards, mouses and trackpads.',
+    version=VERSION,
+    author=AUTHOR,
+    author_email=EMAIL,
+    description=DESCRIPTION,
     license='GPLv3',
-    url='https://github.com/brandizzi/input-device-indicator',
+    url=URL,
     packages=['inputdeviceindicator'],
     package_data={
         'inputdeviceindicator': ['resources/*']
