@@ -1,4 +1,4 @@
-VERSION=0.0.1
+VERSION=$(shell python -c 'from inputdeviceindicator.info import VERSION; print(VERSION)' )
 
 install_local: bdist_deb
 	sudo dpkg -i deb_dist/input-device-indicator*.deb
