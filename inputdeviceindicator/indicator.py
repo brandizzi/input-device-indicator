@@ -22,9 +22,8 @@ gi.require_version('AppIndicator3', '0.1')  # noqa
 from gi.repository import Gtk as gtk
 from gi.repository import AppIndicator3 as appindicator
 
-import os.path
-
 from inputdeviceindicator.menu import get_menu
+from inputdeviceindicator.info import get_icon_path
 
 
 def get_indicator():
@@ -38,16 +37,3 @@ def build_indicator(menu):
     )
     indicator.set_menu(menu)
     return indicator
-
-
-def get_icon_path():
-    """
-    Returns the path to the application icon. Naturally, the application icon
-    file should exist:
-
-    >>> os.path.exists(get_icon_path())
-    True
-    """
-    return os.path.join(
-        os.path.dirname(__file__), 'resources/input-device-indicator.svg'
-    )
