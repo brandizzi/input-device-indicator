@@ -22,12 +22,14 @@ gi.require_version('AppIndicator3', '0.1')  # noqa
 from gi.repository import Gtk as gtk
 
 from inputdeviceindicator.command import XInput
+from inputdeviceindicator.about import get_about_dialog
 
 
 def get_menu():
     xinput = XInput()
     menu = gtk.Menu()
-    menu_callbacks = MenuCallbacks(xinput, menu)
+    about_dialog = get_about_dialog()
+    menu_callbacks = MenuCallbacks(xinput, menu, about_dialog)
     build_menu(menu, xinput.list(), menu_callbacks)
     return menu
 
@@ -84,11 +86,16 @@ def build_menu(menu, devices, callbacks):
     >>> items[3].set_active(True)
     Device B1 toggled to True
 
-    The second last item from the menu is an option to refresh the device
+    The antepenultimate item from the menu is an option to refresh the device
     items...
 
-    >>> items[-2].get_label()
+    >>> items[-3].get_label()
     'Refresh'
+
+    ...the second to last option opens the "About" dialog...
+
+    >>> items[-2].get_label()
+    'About'
 
     ...and the last item from the menu is an option to quit the application:
 
@@ -119,6 +126,10 @@ def build_menu(menu, devices, callbacks):
         'activate', callbacks.refresh_menu_item_activate
     )
     menu.append(refresh_menu_item)
+
+    about_menu_item = gtk.MenuItem(label='About')
+    about_menu_item.connect('activate', callbacks.about_menu_item_activate)
+    menu.append(about_menu_item)
 
     quit_menu_item = gtk.MenuItem(label='Quit')
     quit_menu_item.connect('activate', callbacks.quit_menu_item_activate)
@@ -195,9 +206,10 @@ def build_device_check_menu_item(device, callback):
 
 class MenuCallbacks:
 
-    def __init__(self, xinput, menu):
+    def __init__(self, xinput, menu, about_dialog):
         self.xinput = xinput
         self.menu = menu
+        self.about_dialog = about_dialog
 
     def child_device_check_menu_item_toggled(self, check_menu_item):
         """
@@ -206,8 +218,10 @@ class MenuCallbacks:
 
         It should receive a `XInput`-like object as argument:
 
-        >>> from inputdeviceindicator import mock
-        >>> mcs = MenuCallbacks(mock.MockXInput(), gtk.Menu())
+        >>> from inputdeviceindicator.mock import MockXInput, MockAboutDialog
+        >>> mcs = MenuCallbacks(
+        ...     MockXInput(), gtk.Menu(), MockAboutDialog()
+        ... )
 
         When called with a menu item, it should try to toggle its state:
 
@@ -227,12 +241,32 @@ class MenuCallbacks:
         else:
             self.xinput.disable(check_menu_item.device)
 
+    def about_menu_item_activate(self, menu_item):
+        """
+        Open the "About" dialog.
+
+        >>> from inputdeviceindicator.mock import MockXInput, MockAboutDialog
+        >>> callbacks = MenuCallbacks(
+        ...     MockXInput(), gtk.Menu(), MockAboutDialog()
+        ... )
+
+        It should display the dialog given to the constructor:
+
+        >>> from inelegant.module import temp_var
+        >>> callbacks.about_menu_item_activate(None)
+        about dialog displayed
+        """
+        self.about_dialog.run()
+        self.about_dialog.hide()
+
     def quit_menu_item_activate(self, menu_item):
         """
         Callback for quitting the application.
 
-        >>> from inputdeviceindicator.mock import MockXInput
-        >>> callbacks = MenuCallbacks(MockXInput(), gtk.Menu())
+        >>> from inputdeviceindicator.mock import MockXInput, MockAboutDialog
+        >>> callbacks = MenuCallbacks(
+        ...     MockXInput(), gtk.Menu(), MockAboutDialog()
+        ... )
 
         It should do it by calling `gtk.main_quit()`:
 
@@ -287,16 +321,18 @@ class MenuCallbacks:
         >>> items[3].get_label()
         'B1'
 
-        Also, the second last item should be a "Refresh" option:
+        Also, the antepenultimante item should be a "Refresh" option:
 
-        >>> menu_item = items[-2]
+        >>> menu_item = items[-3]
         >>> menu_item.get_label()
         'Refresh'
 
         Now, if we call `MenuCallbacks.refresh_menu_item_activate()` giving the
-        menu item (and the xinput to `MenuCallback` constructor...
+        menu item (and the xinput to `MenuCallback` constructor)...
 
-        >>> MenuCallbacks(xinput, menu).refresh_menu_item_activate(menu_item)
+        >>> from inputdeviceindicator.mock import MockXInput, MockAboutDialog
+        >>> callbacks = MenuCallbacks(xinput, menu, MockAboutDialog())
+        >>> callbacks.refresh_menu_item_activate(menu_item)
 
         ...the device menu items should be updated:
 

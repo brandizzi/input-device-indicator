@@ -46,5 +46,17 @@ class MockMenuCallbacks:
     def refresh_menu_item_activate(self, menu_item, menu):
         print('Refresh menu item activated')
 
+    def about_menu_item_activate(self, menu_item, menu):
+        print('about menu item activated')
+
     def quit_menu_item_activate(self, menu_item):
         print('Quit menu item activated')
+
+
+class MockAboutDialog:
+
+    def run(self):
+        print('about dialog displayed')
+
+    def hide(self):
+        pass
