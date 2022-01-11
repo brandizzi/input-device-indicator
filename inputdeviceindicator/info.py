@@ -33,7 +33,7 @@ def get_icon_path():
 
 
 PROGRAM_NAME = 'Input Device Indicator'
-VERSION = '0.1.0'
+VERSION = '0.1.1'
 ICON_PATH = get_icon_path()
 DESCRIPTION = 'Enable and disables input devices such as keyboards, mouses and trackpads.'
 URL = 'https://github.com/brandizzi/input-device-indicator'
