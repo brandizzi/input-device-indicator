@@ -22,6 +22,24 @@ is basically a wrapper around
 devices come from the output of `xinput list --long`, and we disable/enable
 them with `xinput disable`/`xinput enable`.
 
+## Development Tips
+
+If you want to change Input Device Indicator's source code, once you cloned the 
+repository, you will need to install the dependencies:
+
+    $ pip install -r requirements.txt
+    $ pip install -r requirements-dev.txt
+
+To test the package locally, you can leverage our Makefile by invoking the 
+`install_local` target:
+
+    $ make install_local
+
+To publish a release in the PPA, we use the `publish` target. Of course, you 
+need to have the right permissions etc.
+
+    $ make publish
+
 ## Why?
 
 Because of this:
